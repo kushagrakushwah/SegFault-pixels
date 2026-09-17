@@ -1,0 +1,19 @@
+structs:
+
+globals:
+
+funcs:
+wrap(scalar x) {
+scalar y
+y = x
+}
+
+main:
+scalar x
+scalar y
+scalar* a
+scalar* b
+a = &x
+b = &y
+call wrap(x)
+call wrap(y)
