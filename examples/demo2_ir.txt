@@ -1,0 +1,21 @@
+structs:
+Node{
+Node* next
+}
+
+globals:
+Node* g
+
+funcs:
+alloc() {
+Node* t
+t = malloc()
+g = t
+}
+
+main:
+Node* a
+Node* b
+call alloc()
+a = g
+b = a

@@ -128,17 +128,20 @@ class QCodeEditorWindow(QWidget):
         self.editor.setPlainText(DEFAULT_PROGRAM)
         self.text = DEFAULT_PROGRAM
 
-        self.openButton    = QPushButton('Open',   self.openFile,   self)
-        self.saveButton    = QPushButton('Save',   self.saveFile,   self)
-        self.saveAsButton  = QPushButton('SaveAs', self.saveAsFile, self)
-        self.analyzeButton = QPushButton('Analyze', self.analyze,   self)
+        self.openButton    = QPushButton('Open IR', self.openFile,   self)
+        self.loadCButton   = QPushButton('Load C',  self.loadCFile,  self)
+        self.saveButton    = QPushButton('Save',    self.saveFile,   self)
+        self.saveAsButton  = QPushButton('Save As', self.saveAsFile, self)
+        self.analyzeButton = QPushButton('Analyze', self.analyze,    self)
         self.saveButton.setEnabled(False)
+        self.loadCButton.setToolTip('Convert a .c file to PTA-Viz IR and load it for analysis')
 
         self.zoomText    = QL('Font:')
         self.zoomSpinBox = QSpinBox(self.updateFontSize, initialFontSize, 5, 150, parent=self)
 
         fileBar = QHBoxLayout()
         fileBar.addWidget(self.openButton)
+        fileBar.addWidget(self.loadCButton)
         fileBar.addWidget(self.saveButton)
         fileBar.addWidget(self.saveAsButton)
         fileBar.addWidget(self.analyzeButton)
@@ -182,7 +185,7 @@ class QCodeEditorWindow(QWidget):
             btn.setChecked(k == key)
 
     def openFile(self):
-        newFilePath = QFileDialog.getOpenFileName(self, 'Open file')[0]
+        newFilePath = QFileDialog.getOpenFileName(self, 'Open IR file', '', 'PTA-Viz IR (*.txt);;All files (*)')[0]
         if newFilePath and newFilePath != self.filePath:
             try:
                 with open(newFilePath, 'r') as f:
@@ -192,6 +195,28 @@ class QCodeEditorWindow(QWidget):
                 self.saveButton.setEnabled(False)
             except:
                 pass
+
+    def loadCFile(self):
+        """Open a .c file, convert to PTA-Viz IR, and load into editor."""
+        cFilePath = QFileDialog.getOpenFileName(self, 'Load C file', '', 'C files (*.c *.h);;All files (*)')[0]
+        if not cFilePath:
+            return
+        try:
+            from c_to_ir import convert_c_to_ir
+            with open(cFilePath, 'r') as f:
+                c_code = f.read()
+            ir = convert_c_to_ir(c_code)
+            self.editor.setPlainText(ir)
+            self.text = ir
+            self.filePath = None
+            self.saveButton.setEnabled(False)
+            self.errorMessage.setText(f'C file converted: {cFilePath}')
+            self.errorMessage.setStyleSheet('QLabel { background-color: #d6ffd6; color: #005500; padding: 4px; }')
+            self.errorMessage.show()
+        except Exception as e:
+            self.errorMessage.setText(f'C conversion error: {e}')
+            self.errorMessage.setStyleSheet('QLabel { background-color: #ffd6d6; color: #8b0000; padding: 4px; }')
+            self.errorMessage.show()
 
     def updateSaveButton(self):
         if self.filePath:

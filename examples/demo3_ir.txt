@@ -1,0 +1,17 @@
+structs:
+Node{
+Node* next
+}
+
+globals:
+
+funcs:
+
+main:
+Node* head
+Node* p
+Node* q
+head = malloc()
+p = malloc()
+head->next = p
+q = head->next
