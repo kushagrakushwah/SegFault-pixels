@@ -1,0 +1,8 @@
+results/
+*.txt
+*.json
+*.png
+*.svg
+!images/*
+__pycache__/
+*.pyc
