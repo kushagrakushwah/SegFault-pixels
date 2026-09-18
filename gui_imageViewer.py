@@ -1,4 +1,4 @@
-﻿from PyQt6.QtCore import Qt, QRect
+from PyQt6.QtCore import Qt, QRect
 from PyQt6.QtWidgets import (QWidget, QHBoxLayout, QVBoxLayout,
                               QScrollArea, QStackedWidget, QPlainTextEdit)
 from PyQt6.QtGui import QColor, QPainter, QPen, QBrush, QFont
@@ -254,7 +254,7 @@ class QFSPTAWidget(QWidget):
         self._onIterChange(1)
 
     def setCurrStmt(self, stmt):
-        self.currStmt = stmt
+        self.currStmt = int(stmt)          # CFG passes string key e.g. '2'
         self._onIterChange(self.iterBox.value())
 
     def _onIterChange(self, val):
@@ -313,7 +313,7 @@ class QVASCOWidget(QWidget):
             self.contextLog.editor.setPlainText('\n'.join(log))
 
     def setCurrStmt(self, stmt):
-        self.currStmt = stmt
+        self.currStmt = int(stmt)          # CFG passes string key e.g. '2'
         self._onIterChange(self.iterBox.value())
 
     def _onIterChange(self, val):
@@ -429,5 +429,5 @@ class QLFCPAWidget(QWidget):
         self.changeRound(1)
 
     def setCurrStmt(self, stmt):
-        self.currStmt = stmt
+        self.currStmt = int(stmt)          # CFG passes string key e.g. '2'
         self.changeRound(self.roundSpinBox.value())
