@@ -1,0 +1,14 @@
+structs:
+
+globals:
+
+funcs:
+
+main:
+scalar* p
+scalar x
+scalar y
+p = &x
+use p
+p = &y
+use p

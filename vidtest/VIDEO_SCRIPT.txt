@@ -1,0 +1,238 @@
+=======================================================
+  PTA-Viz VIDEO SCRIPT  —  Follow this line by line
+  Total time: ~4 minutes
+=======================================================
+
+BEFORE YOU START:
+  1. Open terminal: python gui.py
+  2. Maximize the window
+  3. Keep this file open on your phone or second screen
+  4. Start screen recording: Win+G → Record (or OBS)
+  5. Speak slowly — pause between sentences
+
+=======================================================
+PART 1 — INTRO  [0:00 to 0:20]
+=======================================================
+
+[SCREEN: just show the GUI window — don't touch anything yet]
+
+SAY:
+  "Pointer analysis is one of the most important
+   techniques in modern compilers.
+   It tells you — which pointers can alias —
+   which ones might be pointing to the same memory.
+
+   But every existing tool is a black box.
+   You get a result. You have no idea how.
+
+   PTA-Viz changes that.
+   It shows you every step of the analysis —
+   live, interactive, right in front of you."
+
+=======================================================
+PART 2 — ANDERSEN'S  [0:20 to 1:05]
+=======================================================
+
+[ACTION: Click "Open IR" button]
+[ACTION: Navigate to vidtest/ folder]
+[ACTION: Open 1_andersens.txt]
+
+SAY:
+  "I'll load a simple program.
+   We have two scalar variables, x and y.
+   Three pointers — p, q, and r.
+   p is assigned to x.
+   q copies p.
+   Then p is reassigned to y.
+   r copies q."
+
+[ACTION: Click the "Andersen's" button]
+[ACTION: Click "Analyze"]
+
+SAY:
+  "I'll run Andersen's analysis — the classic
+   flow-insensitive, inclusion-based algorithm."
+
+[ACTION: Wait for analysis to finish]
+[ACTION: Look at the right panel — the graph appears]
+
+SAY:
+  "Analysis done. Look at the result.
+   Andersen's says — p points to BOTH x AND y.
+   Even though we reassigned p to y later —
+   Andersen's ignores program order.
+   It merges everything together.
+   That is an over-approximation."
+
+[ACTION: Change iteration spinner from 1 to 2 (or 3)]
+
+SAY:
+  "I can step through each iteration —
+   watch how the points-to sets grow
+   until they reach a fixed point."
+
+=======================================================
+PART 3 — STEENSGAARD'S  [1:05 to 1:35]
+=======================================================
+
+[ACTION: Click "Steensgaard's" button — same program is still loaded]
+
+SAY:
+  "Now Steensgaard's — on the exact same program.
+   Steensgaard's uses equality-based constraints —
+   faster than Andersen's, but even less precise.
+
+   Look at the result —
+   it merges p, q, and r into the SAME equivalence class.
+   One group. They all point to the same set.
+
+   Andersen's is slower but more precise.
+   Steensgaard's is blazing fast but rougher.
+   PTA-Viz lets you see exactly WHY."
+
+=======================================================
+PART 4 — FS-PTA  [1:35 to 2:20]
+=======================================================
+
+[ACTION: Click "Open IR" → navigate to vidtest/ → open 3_fspta.txt]
+
+SAY:
+  "Now I'll load a program that really shows
+   why flow-sensitivity matters.
+   p is first set to x.
+   Then we use p.
+   Then p is reassigned to y.
+   Then we use p again."
+
+[ACTION: Click "FS-PTA" button]
+[ACTION: Click "Analyze"]
+[ACTION: Wait for analysis]
+
+SAY:
+  "FS-PTA — Flow Sensitive Pointer Analysis.
+   Now watch carefully."
+
+[ACTION: Click the FIRST "use p" node in the CFG]
+
+SAY:
+  "I click the first use of p.
+   FS-PTA says — p points to x.
+   ONLY x. Not y. Because y hasn't been assigned yet."
+
+[ACTION: Click the SECOND "use p" node in the CFG]
+
+SAY:
+  "Now I click the second use of p — after the reassignment.
+   p points to y. ONLY y.
+
+   Compare this to Andersen's — which said p points to x AND y
+   EVERYWHERE in the program.
+
+   Same program. Same pointer.
+   Flow-sensitivity gives you EXACT answers at each line."
+
+=======================================================
+PART 5 — VASCO  [2:20 to 3:10]
+=======================================================
+
+[ACTION: Click "Open IR" → navigate to vidtest/ → open 4_vasco.txt]
+
+SAY:
+  "Now the most powerful analysis — VASCO.
+   Flow-sensitive AND context-sensitive.
+
+   This program has a struct Node,
+   a global pointer g,
+   a function alloc() that does malloc and stores into g,
+   and main() that calls alloc() and reads back through g."
+
+[ACTION: Click "VASCO" button]
+[ACTION: Click "Analyze"]
+[ACTION: Wait for analysis]
+
+SAY:
+  "VASCO complete."
+
+[ACTION: Look at the right panel — point to the CONTEXT LOG at the bottom right]
+
+SAY:
+  "Look at the context log here.
+   VASCO created a separate analysis context for each call.
+   START main — context zero.
+   CALL to alloc — context one.
+   DONE alloc — result memoized.
+   If alloc were called again with the same state —
+   VASCO would skip the re-analysis. That is the termination guarantee."
+
+[ACTION: Click the "call alloc()" node in the CFG]
+
+SAY:
+  "I click the call statement.
+   After this call — g is pointing to the malloc'd object.
+   That result flowed back from alloc to main —
+   through the global variable."
+
+[ACTION: Click the "a = g" node]
+
+SAY:
+  "a now also points to the same object.
+   b equals a — b points to it too.
+   VASCO tracked this precisely — across function boundaries —
+   with full context separation."
+
+=======================================================
+PART 6 — LOAD C FILE  [3:10 to 3:40]
+=======================================================
+
+[ACTION: Click "Load C" button — NOT "Open IR"]
+[ACTION: Navigate to vidtest/ folder]
+[ACTION: Open 6_c_demo.c]
+
+SAY:
+  "One more feature.
+   You don't have to write PTA-Viz IR by hand.
+   I click Load C — and open a real C file."
+
+[ACTION: Watch the editor fill with IR automatically]
+[ACTION: Point to the green banner that says "C file converted"]
+
+SAY:
+  "Our C-to-IR transpiler just converted that automatically.
+   Structs — handled.
+   malloc — handled.
+   Function calls — handled.
+   No LLVM. No Clang. Pure Python.
+
+   Now I click Analyze."
+
+[ACTION: Click Analyze]
+[ACTION: Switch through algo tabs: Andersen's → FS-PTA → VASCO]
+
+SAY:
+  "All five algorithms — running on a real C program.
+   Andersen's. FS-PTA. VASCO."
+
+=======================================================
+PART 7 — CLOSE  [3:40 to 4:00]
+=======================================================
+
+[ACTION: Stay on VASCO tab — most impressive view]
+[ACTION: Slowly scroll the context log]
+
+SAY:
+  "PTA-Viz makes the invisible visible.
+   For students learning compilers —
+   for researchers building new algorithms —
+   for anyone who wants to understand
+   what their compiler is actually doing with pointers.
+
+   Everything is open source.
+   Link is in the description.
+
+   Thank you."
+
+[ACTION: Hold for 3 seconds — then stop recording]
+
+=======================================================
+  DONE. Upload to YouTube as UNLISTED. Paste the link.
+=======================================================
