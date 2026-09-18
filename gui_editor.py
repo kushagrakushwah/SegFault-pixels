@@ -250,12 +250,24 @@ class QCodeEditorWindow(QWidget):
         self.editor.updateFont(self.editorFont)
 
     def analyze(self):
+        import io, sys
         from main import perform_analysis
         self.errorMessage.hide()
         self.errorMessage.setText('')
-        err = perform_analysis(self.editor.toPlainText())
+
+        # Capture terminal output during analysis
+        captured = io.StringIO()
+        old_stdout = sys.stdout
+        sys.stdout = captured
+        try:
+            err = perform_analysis(self.editor.toPlainText())
+        finally:
+            sys.stdout = old_stdout
+
+        log = captured.getvalue().strip()
+
         if err:
             self.errorMessage.setText('Error: ' + err)
             self.errorMessage.show()
         else:
-            self.parentAnalyzeFunc()
+            self.parentAnalyzeFunc(log)

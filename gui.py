@@ -1,7 +1,8 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (QWidget, QHBoxLayout, QVBoxLayout,
-                              QApplication, QStackedWidget, QSizePolicy, QLabel)
-from PyQt6.QtGui import QFont
+                              QApplication, QStackedWidget, QSizePolicy,
+                              QLabel, QPlainTextEdit)
+from PyQt6.QtGui import QFont, QColor
 from guiHelper import QSplitter
 from gui_imageViewer import (QLFCPAWidget, QCFGWindow,
                               QAndersensWidget, QSteensgaardsWidget,
@@ -47,10 +48,29 @@ class QApp(QWidget):
         splitter.setStretchFactor(1, 3)
         splitter.setStretchFactor(2, 4)
 
-        hbox = QHBoxLayout(self)
-        hbox.addWidget(splitter)
-        self.setLayout(hbox)
-        hbox.setContentsMargins(4, 4, 4, 4)
+        # ── Analysis Log Bar (bottom) ────────────────────────────────────────
+        logHeader = QLabel('  ▶ Analysis Log')
+        logHeader.setStyleSheet(
+            'background:#0078d7; color:white; font-weight:bold; padding:2px 6px;')
+        logHeader.setFixedHeight(22)
+
+        self.logBox = QPlainTextEdit()
+        self.logBox.setReadOnly(True)
+        self.logBox.setFixedHeight(90)
+        self.logBox.setFont(QFont('Consolas', 11))
+        self.logBox.setStyleSheet(
+            'background:#f0f4ff; color:#141414; border:none;'
+            'border-top: 1px solid #c8c8c8;')
+        self.logBox.setPlainText('Run Analyze to see iteration counts here.')
+        # ────────────────────────────────────────────────────────────────────
+
+        vbox = QVBoxLayout(self)
+        vbox.addWidget(splitter)
+        vbox.addWidget(logHeader)
+        vbox.addWidget(self.logBox)
+        self.setLayout(vbox)
+        vbox.setContentsMargins(4, 4, 4, 0)
+        vbox.setSpacing(0)
 
     def _onAlgoChange(self, algo):
         self.currAlgo = algo
@@ -61,8 +81,15 @@ class QApp(QWidget):
         if os.path.exists(infoPath):
             self._loadResults(algo)
 
-    def _onAnalyzeComplete(self):
+    def _onAnalyzeComplete(self, log=''):
         self._loadResults(self.currAlgo)
+        if log:
+            self.logBox.setPlainText(log)
+            # Scroll to bottom
+            cursor = self.logBox.textCursor()
+            from PyQt6.QtGui import QTextCursor
+            cursor.movePosition(QTextCursor.MoveOperation.End)
+            self.logBox.setTextCursor(cursor)
 
     def _loadResults(self, algo):
         infoPath = './results/%s/info.json' % algo
