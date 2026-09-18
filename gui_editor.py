@@ -69,7 +69,7 @@ class QCodeEditor(QPlainTextEdit):
         self.numberBar = self.NumberBar(self)
         self.currentLineNumber = None
         self.blockHeight = None
-        self.currentLineColor = self.palette().alternateBase()
+        self.currentLineColor = QColor(255, 255, 180)  # light yellow on white bg
         self.cursorPositionChanged.connect(self.highligtCurrentLine)
 
     def resizeEvent(self, *e):
