@@ -2,7 +2,7 @@
 
 **An Interactive Visualization Tool for Flow-Sensitive, Context-Sensitive Pointer Analysis**
 
-Built for SegFault 2026 | IISc Bengaluru Finale | Track: Compiler Frameworks & Tools
+Built for SegFault 2026 | IISc Bengaluru Finale | Track: Explainable compilers
 
 ---
 
